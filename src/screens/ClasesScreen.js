@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   View,
   Text,
@@ -7,11 +7,14 @@ import {
   Image,
   TextInput,
   ScrollView,
+  FlatList,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import LabelLevel from "../components/LabelLevel";
 import NivelChip from "../components/NivelChip";
+import useResponsive from "../hooks/useResponsive";
+import { Card } from "../components/Card";
 import { colors, radius, spacing, typography } from "../theme";
 import { formatearPrecio, CLASES, NIVELES } from "../data/classes";
 
@@ -24,8 +27,21 @@ se instala la librería en este orden:
 
 export default function ClasesScreen({ navigation }) {
   const insets = useSafeAreaInsets();
+  const {columnas, paddingHorizontal} = useResponsive()
   const [nivel, setNivel] = useState();
   const [busqueda, setBusqueda] = useState("");
+
+  const resultados = useMemo(() => {
+    const textoBusqueda = busqueda.trim().toLocaleLowerCase();
+    return CLASES.filter((clase) => {
+      const coincidenciaNivel = nivel === "Todos" || clase.nivel === nivel;
+      const coincidenciaTexto =
+        textoBusqueda ||
+        clase.titulo.toLocaleLowerCase().includes(textoBusqueda) ||
+        clase.profesor.nombre.toLocaleLowerCase().includes(textoBusqueda);
+      return coincidenciaNivel && coincidenciaTexto;
+    });
+  }, [nivel, busqueda]);
 
   return (
     <View style={[style.pantalla, { paddingTop: insets.top + spacing.md }]}>
@@ -58,6 +74,22 @@ export default function ClasesScreen({ navigation }) {
           />
         ))}
       </ScrollView>
+      <FlatList
+        data={resultados}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => {
+          <Card
+            clase={item}
+            onPress={() => navigation.navegate("DetalleClase", { clase: item })}
+            showVerticalScrollIndicator = {false}
+            contentContainerStyle={{
+              paddingHorizontal,
+              flexGrow: 1
+            }}
+          />;
+        }}
+      />
+      //Agregar la opción
     </View>
   );
 }

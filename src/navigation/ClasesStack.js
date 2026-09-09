@@ -14,6 +14,11 @@ export default function ClasesStack() {
         // va en doble llave porque es un atributo
         option={{ headerShow: false }}
       />
+      <Stack.Screen 
+      name="DetalleCase" 
+      component={DetalleClasesScren}
+      options={{title: 'Detalle', headerBackTitle: 'Atrás'}}
+      />
     </Stack.Navigator>
   );
 }

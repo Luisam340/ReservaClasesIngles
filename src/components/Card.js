@@ -4,11 +4,9 @@ import LabelLevel from "./LabelLevel";
 import { colors, radius, spacing, typography } from "../theme";
 import { formatearPrecio } from "../data/classes";
 
-export default function Card({ clase /*, onPress*/ }) {
+export default function Card({ clase, onPress }) {
   return (
-    <Pressable
-    //onPress={onPress}
-    >
+    <Pressable onPress={onPress}>
       <Image source={{ uri: clase.imagen }} />
       <View>
         <LabelLevel nivel={clase.nivel} />

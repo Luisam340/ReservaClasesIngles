@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import {
+  Alert,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -9,146 +10,164 @@ import {
   TextInput,
   View,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { colors, radius, sombra, spacing, typography } from "../theme";
 
-import { colors, spacing, typography } from "../theme";
-import { useNavigation } from "@react-navigation/native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import useResponsive from "../hooks/useResponsive";
+const STORAGE_KEY = "estudiante";
 
-export default function Registro({ })  {
-  const navigation = useNavigation();
-  const insets = useSafeAreaInsets();
-  const { isTablet } = useResponsive();
+export default function Registro({ navigation }) {
+  const [formulario, setFormulario] = useState({
+    nombre: "",
+    apellido: "",
+    correo: "",
+    contrasena: "",
+    confirmarContrasena: "",
+  });
+
+  function cambiarFormulario(campo, valor) {
+    setFormulario((actual) => ({ ...actual, [campo]: valor }));
+  }
+
+  async function registrar() {
+    const nombre = formulario.nombre.trim();
+    const apellido = formulario.apellido.trim();
+    const correo = formulario.correo.trim().toLowerCase();
+
+    if (!nombre || !apellido || !correo || !formulario.contrasena || !formulario.confirmarContrasena) {
+      Alert.alert("Campos incompletos", "Completa todos los campos.");
+      return;
+    }
+
+    if (formulario.contrasena !== formulario.confirmarContrasena) {
+      Alert.alert("Revisa la contraseña", "Las contraseñas no coinciden.");
+      return;
+    }
+
+    try {
+      await AsyncStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({ nombre, apellido, correo }),
+      );
+      Alert.alert("Registro guardado", "Tus datos quedaron guardados en este dispositivo.", [
+        { text: "Continuar", onPress: () => navigation.replace("Login") },
+      ]);
+    } catch {
+      Alert.alert("Error", "No se pudieron guardar los datos.");
+    }
+  }
 
   return (
-  <KeyboardAvoidingView style={{ flex: 1 }}
-    behavior={Platform.OS === "ios" ? "padding" : "height"}>
-    <ScrollView
-      style={[
-        styles.pantalla,
-        { paddingTop: insets.top, paddingBottom: insets.bottom },
-      ]}
-      contentContainerStyle={styles.contenido}
-      keyboardShouldPersistTaps="handled"
+    <KeyboardAvoidingView
+      style={styles.pantalla}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      <Text style={styles.titulo}>Regístrate</Text>
-
+      <ScrollView
+        contentContainerStyle={styles.contenido}
+        keyboardShouldPersistTaps="handled"
+      >
         <View style={styles.formulario}>
-            <TextInput style={styles.TextInput} placeholder="Nombre" />
-            <TextInput style={styles.TextInput} placeholder="Apellido" />
-            <TextInput style={styles.TextInput} placeholder="Correo electrónico" />
-            <TextInput style={styles.TextInput} placeholder="Contraseña" secureTextEntry={true} />
-            <TextInput style={styles.TextInput} placeholder="Confirmar contraseña"
-            secureTextEntry={true} />
+          <Text style={styles.titulo}>Regístrate</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Nombre"
+            value={formulario.nombre}
+            onChangeText={(valor) => cambiarFormulario("nombre", valor)}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Apellido"
+            value={formulario.apellido}
+            onChangeText={(valor) => cambiarFormulario("apellido", valor)}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Correo electrónico"
+            value={formulario.correo}
+            onChangeText={(valor) => cambiarFormulario("correo", valor)}
+            keyboardType="email-address"
+            autoCapitalize="none"
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Contraseña"
+            value={formulario.contrasena}
+            onChangeText={(valor) => cambiarFormulario("contrasena", valor)}
+            secureTextEntry
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Confirmar contraseña"
+            value={formulario.confirmarContrasena}
+            onChangeText={(valor) =>
+              cambiarFormulario("confirmarContrasena", valor)
+            }
+            secureTextEntry
+          />
+          <Pressable
+            accessibilityRole="button"
+            onPress={registrar}
+            style={({ pressed }) => [
+              styles.boton,
+              pressed && styles.presionado,
+            ]}
+          >
+            <Text style={styles.textoBoton}>Registrarme</Text>
+          </Pressable>
         </View>
-        <View>
-            <Pressable
-              onPress={() => navigation.navigate("#")}
-              style={({ pressed }) => [
-                styles.boton,
-                styles.botonRegistro,
-                pressed && styles.botonPresionado,
-              ]}>
-              <Text style={[styles.textoBoton, styles.textoRegistro]}>
-                Registrarme
-              </Text>
-            </Pressable>
-        </View>
-    </ScrollView>
-  </KeyboardAvoidingView>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
-
 
 const styles = StyleSheet.create({
   pantalla: {
     flex: 1,
-    padding: spacing.sm,
     backgroundColor: colors.fondo,
   },
   contenido: {
     flexGrow: 1,
     justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.xl,
   },
-
-  portada: {
-    width: "100%",
-    backgroundColor: colors.primarioSuave,
-  },
-
-  titulo: {
-    fontSize: 24,
-    fontWeight: "800",
-    color: colors.texto,
-    marginTop: spacing.sm,
-    marginBottom: spacing.lg,
-    marginHorizontal: 10,
-  },
-
   formulario: {
     width: "100%",
-  },
-
-  datoTexto: {
-    fontSize: 12,
-    color: colors.textoSuave,
-  },
-
-  descripcion: {
-    ...typography.cuerpo,
-    color: colors.textoSuave,
-    lineHeight: 22,
-    marginTop: spacing.sm,
-    marginBottom: spacing.lg,
-    marginHorizontal: 10,
-  },
-
-  barra: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    bottom: 0,
-    flexDirection: "row",
-    alignItems: "center",
+    maxWidth: 460,
+    padding: spacing.xl,
     backgroundColor: colors.superficie,
-    borderTopWidth: 1,
-    borderTopColor: colors.borde,
-    paddingVertical: spacing.lg,
-    paddingTop: spacing.lg,
-    gap: spacing.lg,
+    borderColor: colors.borde,
+    borderWidth: 1,
+    borderRadius: radius.lg,
+    ...sombra,
   },
-
-  textoBoton: {
-    color: colors.primarioSuave,
-    fontSize: 16,
-    fontWeight: "600",
+  titulo: {
+    ...typography.titulo,
+    textAlign: "center",
+    marginBottom: spacing.lg,
   },
-
-  botonRegistro: {
-    backgroundColor: colors.exito,
+  input: {
+    height: 52,
+    backgroundColor: colors.fondo,
+    borderColor: colors.borde,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    marginBottom: spacing.md,
+    paddingHorizontal: spacing.lg,
   },
-
   boton: {
     alignItems: "center",
+    backgroundColor: colors.exito,
+    borderRadius: radius.md,
     justifyContent: "center",
-    padding: spacing.md,
-    borderRadius: spacing.sm,
     marginTop: spacing.sm,
+    minHeight: 52,
   },
-
-  botonPresionado: {
+  presionado: {
     opacity: 0.8,
   },
-
-  textoRegistro: {
+  textoBoton: {
     color: colors.superficie,
-  },
-
-  TextInput: {
-    borderWidth: 1,
-    borderColor: colors.borde,
-    borderRadius: spacing.sm,
-    padding: spacing.sm,
-    marginBottom: spacing.sm,
+    fontWeight: "600",
   },
 });

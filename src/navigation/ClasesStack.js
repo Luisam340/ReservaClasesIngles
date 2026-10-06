@@ -5,6 +5,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { colors } from "../theme";
 import InicioScreen from "../screens/InicioScreen";
 import DetalleClase from "../screens/DetalleClasesScreen";
+import LoginScreen from "../screens/LoginScreen";
 import Registro from "../components/Registro";
 import ReservasScreen from "../screens/ReservasScreen";
 import PerfilScreen from "../screens/PerfilScreen";
@@ -71,6 +72,10 @@ export default function ClasesStack() {
       name="Registro"
       component={Registro}
       options={{ title: "Registro", headerBackTitle: "Atrás" }}
+      />
+      <Stack.Screen
+        name="Login"
+        component={LoginScreen}
       />
     </Stack.Navigator>
 

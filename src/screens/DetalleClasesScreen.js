@@ -1,28 +1,132 @@
-import  { useState } from "react";
+import { useEffect, useState } from "react";
 import {View, Text, StyleSheet, ScrollView, Alert, Image, Pressable} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import useResponsive from "../hooks/useResponsive";
 import { colors, spacing, radius, typography, sombra } from "../theme";
 import { formatearPrecio } from "../data/classes";
 import LabelLevel from "../components/LabelLevel";
 
-export default function DetalleClasesScreen({ route }) {
+const CLAVE_RESERVAS = "reservas";
+
+async function cargarReservas() {
+  const guardadas = await AsyncStorage.getItem(CLAVE_RESERVAS);
+  if (!guardadas) return [];
+
+  const reservas = JSON.parse(guardadas);
+  return Array.isArray(reservas) ? reservas : [];
+}
+
+export default function DetalleClasesScreen({ route, navigation }) {
   const insets = useSafeAreaInsets();
   const { clase } = route.params;// otra manera de desestructurar objetos
-  const { paddingHorizantal, esTablet } = useResponsive();
+  const { paddingHorizontal, esTablet } = useResponsive();
   const [cupos, setCupos] = useState(clase.cupos);
-  const restarCupos = () => {
-    if (cupos >= 1) {
-      setCupos((cupoRestante) => cupoRestante - 1);
-      Alert.alert("Reservar Clases", `Has reservado ${clase.titulo}`);
-    } else {
-      Alert.alert(
-        "Reservar Clases",
-        `La clase ${clase.titulo} no cuenta con más cupos`,
-      );
+  const [horarioSeleccionado, setHorarioSeleccionado] = useState(null);
+  const [guardando, setGuardando] = useState(false);
+
+  useEffect(() => {
+    async function cargarCupos() {
+      const reservas = await cargarReservas();
+      const ocupados = reservas.filter(
+        (reserva) => reserva.claseId === clase.id,
+      ).length;
+      setCupos(Math.max(0, clase.cupos - ocupados));
     }
-  };
+
+    cargarCupos().catch(() => {
+      Alert.alert("Error", "No se pudieron cargar los cupos.");
+    });
+  }, [clase.cupos, clase.id]);
+
+  async function reservar() {
+    if (!horarioSeleccionado) {
+      Alert.alert("Elige un horario", "Selecciona un horario para continuar.");
+      return;
+    }
+
+    if (cupos < 1) {
+      Alert.alert("Sin cupos", "Esta clase ya no tiene cupos disponibles.");
+      return;
+    }
+
+    setGuardando(true);
+    try {
+      const datosEstudiante = await AsyncStorage.getItem("estudiante");
+      if (!datosEstudiante) {
+        Alert.alert(
+          "Regístrate primero",
+          "Necesitas un perfil para guardar la reserva.",
+          [
+            { text: "Cancelar", style: "cancel" },
+            {
+              text: "Registrarme",
+              onPress: () => navigation.navigate("Registro"),
+            },
+          ],
+        );
+        return;
+      }
+
+      const estudiante = JSON.parse(datosEstudiante);
+      const correo = estudiante.correo.trim().toLowerCase();
+      const reservas = await cargarReservas();
+      const horarioOcupado = reservas.some(
+        (reserva) =>
+          reserva.estudianteCorreo === correo &&
+          reserva.horario === horarioSeleccionado,
+      );
+
+      if (horarioOcupado) {
+        Alert.alert("Horario ocupado", "Ya reservaste ese horario.");
+        return;
+      }
+
+      const reservasClase = reservas.filter(
+        (reserva) => reserva.claseId === clase.id,
+      );
+      if (reservasClase.length >= clase.cupos) {
+        setCupos(0);
+        Alert.alert("Sin cupos", "Esta clase ya no tiene cupos disponibles.");
+        return;
+      }
+
+      const nuevaReserva = {
+        id: `${Date.now()}`, //
+        estudianteCorreo: correo,
+        estudianteNombre: `${estudiante.nombre} ${estudiante.apellido}`,
+        claseId: clase.id,
+        claseTitulo: clase.titulo,
+        horario: horarioSeleccionado,
+        duracion: clase.duracion,
+        precio: clase.precio,
+      };
+
+      await AsyncStorage.setItem(
+        CLAVE_RESERVAS,
+        JSON.stringify([...reservas, nuevaReserva]),
+      );
+      setCupos(Math.max(0, clase.cupos - reservasClase.length - 1));
+      Alert.alert(
+        "Reserva guardada",
+        "La reserva quedó asociada a tu perfil.",
+        [
+          {
+            text: "Ver reservas",
+            onPress: () =>
+              navigation.navigate("ClasesTabs", { screen: "Reservas" }),
+          },
+          { text: "Seguir aquí", style: "cancel" },
+        ],
+      );
+    } catch (error) {
+      const detalle = error instanceof Error ? error.message : String(error);
+      Alert.alert("Error", `No se pudo guardar la reserva. ${detalle}`);
+    } finally {
+      setGuardando(false);
+    }
+  }
   return (
     <View style={estilos.pantalla}>
       <ScrollView
@@ -39,7 +143,7 @@ export default function DetalleClasesScreen({ route }) {
 
         <View
           style={{
-            paddingHorizontal: paddingHorizantal,
+            paddingHorizontal,
             paddingTop: spacing.lg,
           }}
         >
@@ -93,9 +197,32 @@ export default function DetalleClasesScreen({ route }) {
 
           <Text style={estilos.datoValor}>Elige tu horario</Text>
 
-          <Text style={[estilos.horario, estilos.margin]}>
-            {clase.horarios.join(" - ")}
-          </Text>
+          <View style={estilos.horarios}>
+            {clase.horarios.map((horario) => {
+              const seleccionado = horario === horarioSeleccionado;
+              return (
+                <Pressable
+                  key={horario}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected: seleccionado }}
+                  onPress={() => setHorarioSeleccionado(horario)}
+                  style={[
+                    estilos.horario,
+                    seleccionado && estilos.horarioSeleccionado,
+                  ]}
+                >
+                  <Text
+                    style={[
+                      estilos.horarioTexto,
+                      seleccionado && estilos.horarioTextoSeleccionado,
+                    ]}
+                  >
+                    {horario}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
         </View>
       </ScrollView>
 
@@ -103,7 +230,7 @@ export default function DetalleClasesScreen({ route }) {
         style={[
           estilos.barra,
           {
-            paddingHorizontal: paddingHorizantal,
+            paddingHorizontal,
             paddingBottom: Math.max(insets.bottom, spacing.lg),
           },
         ]}
@@ -115,23 +242,18 @@ export default function DetalleClasesScreen({ route }) {
         </View>
 
         <Pressable
-          onPress={() => {
-            {
-              /*setCupos((cupos) => cupos - 1);*/
-            }
-            restarCupos();
-          }}
-          style={({ pressed }) => ({
-            backgroundColor: pressed ? colors.primarioOscuro : colors.primario,
-            paddingVertical: 12,
-            width: 200,
-            justifyContent: "center",
-            alignItems: "center",
-            borderRadius: 25,
-            marginVertical: 5,
-          })}
+          onPress={reservar}
+          disabled={!horarioSeleccionado || cupos < 1 || guardando}
+          style={({ pressed }) => [
+            estilos.botonReservar,
+            pressed && estilos.botonPresionado,
+            (!horarioSeleccionado || cupos < 1 || guardando) &&
+              estilos.botonDeshabilitado,
+          ]}
         >
-          <Text style={estilos.textoBoton}>Reservar</Text>
+          <Text style={estilos.textoBoton}>
+            {guardando ? "Guardando..." : "Reservar"}
+          </Text>
         </Pressable>
       </View>
     </View>
@@ -260,6 +382,24 @@ const estilos = StyleSheet.create({
 
   horarioTextoSeleccionado: {
     color: colors.primarioSuave,
+  },
+
+  botonReservar: {
+    backgroundColor: colors.primario,
+    paddingVertical: 12,
+    width: 200,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: radius.md,
+    marginVertical: 5,
+  },
+
+  botonPresionado: {
+    backgroundColor: colors.primarioOscuro,
+  },
+
+  botonDeshabilitado: {
+    opacity: 0.5,
   },
 
   barra: {

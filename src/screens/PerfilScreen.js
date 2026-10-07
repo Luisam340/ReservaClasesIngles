@@ -1,48 +1,89 @@
-import React from "react";
-import { StyleSheet, Text, View, Pressable } from "react-native";
+import React, { useCallback, useState } from "react";
+import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { colors, spacing, typography } from "../theme";
-import { useNavigation } from "@react-navigation/native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import useResponsive from "../hooks/useResponsive";
 
 export default function PerfilScreen() {
   const navigation = useNavigation();
-  const insets = useSafeAreaInsets();
-  const { isTablet } = useResponsive();
+  const [estudiante, setEstudiante] = useState(null);
+  const [cargando, setCargando] = useState(true);
+
+  useFocusEffect(
+    useCallback(() => {
+      let activa = true;
+
+      async function cargar() {
+        setCargando(true);
+        try {
+          const guardado = await AsyncStorage.getItem("estudiante");
+          if (activa) setEstudiante(guardado ? JSON.parse(guardado) : null);
+        } catch {
+          if (activa) Alert.alert("Error", "No se pudo cargar el perfil.");
+        } finally {
+          if (activa) setCargando(false);
+        }
+      }
+
+      cargar();
+      return () => {
+        activa = false;
+      };
+    }, []),
+  );
+
   return (
-    <View style={[
-      styles.pantalla,
-      { paddingTop: insets.top, paddingBottom: insets.bottom },
-    ]}>
-      <Text style={styles.titulo}>Bienvenido
-      </Text>
-
-      <Pressable
-        onPress={() => navigation.navigate("Login")}
-        style={({ pressed }) => [
-          styles.boton,
-          styles.botonInicio,
-          pressed && styles.botonPresionado,
-        ]}
-      >
-        <Text style={[styles.textoBoton, styles.textoInicio]}>
-          Iniciar Sesión
-        </Text>
-      </Pressable>
-
-      <Pressable
-        onPress={() => navigation.navigate("Registro")}
-        style={({ pressed }) => [
-          styles.boton,
-          styles.botonRegistro,
-          pressed && styles.botonPresionado,
-        ]}
-      >
-        <Text style={[styles.textoBoton, styles.textoRegistro]}>
-          Registrarme
-        </Text>
-      </Pressable>
-
+    <View style={styles.pantalla}>
+      {cargando ? (
+        <Text style={styles.detalle}>Cargando perfil...</Text>
+      ) : estudiante ? (
+        <>
+          <Text style={styles.titulo}>Perfil del estudiante</Text>
+          <Text style={styles.detalle}>Nombre: {estudiante.nombre}</Text>
+          <Text style={styles.detalle}>Apellido: {estudiante.apellido}</Text>
+          <Text style={styles.detalle}>Correo: {estudiante.correo}</Text>
+          <Pressable
+            onPress={() => navigation.navigate("Reservas")}
+            style={({ pressed }) => [
+              styles.boton,
+              styles.botonInicio,
+              pressed && styles.botonPresionado,
+            ]}
+          >
+            <Text style={[styles.textoBoton, styles.textoInicio]}>
+              Mis reservas
+            </Text>
+          </Pressable>
+        </>
+      ) : (
+        <>
+          <Text style={styles.titulo}>Bienvenido</Text>
+          <Pressable
+            onPress={() => navigation.navigate("Login")}
+            style={({ pressed }) => [
+              styles.boton,
+              styles.botonInicio,
+              pressed && styles.botonPresionado,
+            ]}
+          >
+            <Text style={[styles.textoBoton, styles.textoInicio]}>
+              Iniciar Sesión
+            </Text>
+          </Pressable>
+          <Pressable
+            onPress={() => navigation.navigate("Registro")}
+            style={({ pressed }) => [
+              styles.boton,
+              styles.botonRegistro,
+              pressed && styles.botonPresionado,
+            ]}
+          >
+            <Text style={[styles.textoBoton, styles.textoRegistro]}>
+              Registrarme
+            </Text>
+          </Pressable>
+        </>
+      )}
     </View>
   );
 }
@@ -66,6 +107,7 @@ const styles = StyleSheet.create({
   detalle: {
     ...typography.cuerpo,
     color: colors.textoSuave,
+    marginBottom: spacing.sm,
   },
   textoBoton: {
     fontSize: 16,

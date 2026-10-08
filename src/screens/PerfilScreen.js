@@ -19,11 +19,7 @@ export default function PerfilScreen() {
         try {
           const guardado = await AsyncStorage.getItem('estudiante');
           if (activa) setEstudiante(guardado ? JSON.parse(guardado) : null);
-          const semilla = `${Date.now()}-${Math.random()}`;
-
-          setFotoPerfil(
-            `https://api.dicebear.com/10.x/avataaars/png?seed=${encodeURIComponent(semilla)}`,
-          );
+          if(guardado) setFotoPerfil(`https://api.dicebear.com/10.x/avataaars/png?seed=${encodeURIComponent(guardado.foto)}`,)
         } catch {
           if (activa) Alert.alert('Error', 'No se pudo cargar el perfil.');
         } finally {
@@ -48,9 +44,10 @@ export default function PerfilScreen() {
             <Image source={{ uri: fotoPerfil }} style={styles.avatar} />
           )}
           <Text style={styles.titulo}>Perfil del estudiante</Text>
-          <Text style={styles.detalle}>Nombre: {estudiante.nombre}</Text>
-          <Text style={styles.detalle}>Apellido: {estudiante.apellido}</Text>
-          <Text style={styles.detalle}>Correo: {estudiante.correo}</Text>
+          <Text style={styles.detalle}>
+            {estudiante.nombre} {estudiante.apellido}
+          </Text>
+          <Text style={styles.detalle}>{estudiante.correo}</Text>
           <Pressable
             onPress={() => navigation.navigate('Reservas')}
             style={({ pressed }) => [
@@ -147,9 +144,9 @@ const styles = StyleSheet.create({
     color: colors.superficie,
   },
   avatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
     backgroundColor: colors.borde,
   },
 });

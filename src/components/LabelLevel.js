@@ -1,6 +1,6 @@
-import { React } from "react";
-import { View, Text, StyleSheet } from "react-native";
-import { colors, spacing } from "../theme";
+import { React } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import { colors, spacing } from '../theme';
 
 export default function LabelLevel({ nivel }) {
   return (
@@ -11,7 +11,7 @@ export default function LabelLevel({ nivel }) {
 }
 const styles = StyleSheet.create({
   container: {
-    alignSelf: "flex-start",
+    alignSelf: 'flex-start',
     borderRadius: 12,
     paddingVertical: 5,
     paddingHorizontal: 6,
@@ -20,6 +20,6 @@ const styles = StyleSheet.create({
   text: {
     color: colors.primario,
     fontSize: 13,
-    fontWeight: "600",
+    fontWeight: '600',
   },
 });

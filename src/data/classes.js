@@ -65,7 +65,7 @@ export const CLASES = [
     modalidad: "Presencial",
     rating: 4.7,
     cupos: 3,
-    horarios: ["Lun 8:00 p.m.", "Mié 8:00 p.m."],
+    horarios: ["Lun 8:00 p.m.", "Mié 8:00 p.m.", "Vie 6:00 p.m."],
   },
   {
     id: "4",

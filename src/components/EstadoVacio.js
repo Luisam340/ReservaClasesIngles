@@ -1,10 +1,10 @@
-import react from "react";
-import { View, Text, StyleSheet } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { colors, spacing } from "../theme";
+import react from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { colors, spacing } from '../theme';
 
 export default function EstadoVacio({
-  icono = "calendar-outline",
+  icono = 'calendar-outline',
   titulo,
   mensaje,
   onAction,
@@ -23,8 +23,8 @@ export default function EstadoVacio({
 const styles = StyleSheet.create({
   contenedor: {
     flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
     padding: spacing.xxl,
   },
   circulo: {
@@ -32,20 +32,20 @@ const styles = StyleSheet.create({
     height: 72,
     borderRadius: 36,
     backgroundColor: colors.primarioSuave,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: spacing.lg,
   },
   titulo: {
     fontSize: 17,
-    fontWeight: "700",
+    fontWeight: '700',
     color: colors.texto,
-    textAlign: "center",
+    textAlign: 'center',
   },
   mensaje: {
     fontSize: 14,
     color: colors.textoSuave,
-    textAlign: "center",
+    textAlign: 'center',
     marginTop: spacing.sm,
     lineHeight: 20,
   },

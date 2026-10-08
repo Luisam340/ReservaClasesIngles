@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
   View,
   Text,
@@ -6,23 +6,23 @@ import {
   StyleSheet,
   Image,
   ScrollView,
-} from "react-native";
-import LabelLevel from "./LabelLevel";
-import { colors, radius, spacing, typography } from "../theme";
-import useResponsive from "../hooks/useResponsive";
-import { formatearPrecio } from "../data/classes";
+} from 'react-native';
+import LabelLevel from './LabelLevel';
+import { colors, radius, spacing, typography } from '../theme';
+import useResponsive from '../hooks/useResponsive';
+import { formatearPrecio } from '../data/classes';
 
 export default function Card({ clase, onPress }) {
   const { paddingHorizantal, esTablet } = useResponsive();
   return (
     <View style={estilos.tarjeta}>
-      <Pressable onPress={onPress} style={{ overflow: "hidden" }}>
+      <Pressable onPress={onPress} style={{ overflow: 'hidden' }}>
         <Image
           source={{ uri: clase.imagen }}
-          resizeMethod="cover"
+          resizeMethod='cover'
           style={[
             estilos.portada,
-            { height: esTablet ? 300 : 220, width: "auto" },
+            { height: esTablet ? 300 : 220, width: 'auto' },
           ]}
         />
 
@@ -35,7 +35,7 @@ export default function Card({ clase, onPress }) {
         </Text>
 
         <Text style={[estilos.horario, estilos.margin]}>
-          {clase.horarios.join(" - ")}
+          {clase.horarios.join(' - ')}
         </Text>
 
         <Text style={[estilos.precio, estilos.margin]}>
@@ -56,15 +56,15 @@ const estilos = StyleSheet.create({
     marginVertical: 10,
     backgroundColor: colors.tarjetas,
     borderRadius: 35,
-    overflow: "hidden",
+    overflow: 'hidden',
   },
   portada: {
-    width: "100%",
+    width: '100%',
     height: 180,
   },
   profesor: {
     fontSize: 18,
-    fontWeight: "700",
+    fontWeight: '700',
     color: colors.texto,
   },
   horario: {
@@ -74,19 +74,19 @@ const estilos = StyleSheet.create({
   },
   precio: {
     fontSize: 18,
-    fontWeight: "800",
+    fontWeight: '800',
     color: colors.primario,
     marginBottom: 10,
   },
   textoBoton: {
     color: colors.primarioSuave,
     fontSize: 16,
-    fontWeight: "600",
+    fontWeight: '600',
   },
   contenidoScroll: {
     flexGrow: 1,
-    alignItems: "center",
-    justifyContent: "space-between",
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   scroll: {
     flexGrow: 1,

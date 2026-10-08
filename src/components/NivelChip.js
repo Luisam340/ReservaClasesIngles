@@ -1,6 +1,6 @@
-import React, { act } from "react";
-import { Pressable, Text, StyleSheet } from "react-native";
-import { colors, radius, spacing, typography } from "../theme";
+import React, { act } from 'react';
+import { Pressable, Text, StyleSheet } from 'react-native';
+import { colors, radius, spacing, typography } from '../theme';
 
 export default function NivelChip({ etiqueta, activo, onPress }) {
   return (
@@ -34,6 +34,6 @@ const style = StyleSheet.create({
     backgroundColor: colors.primario,
     borderColor: colors.primario,
   },
-  texto: { fontSize: 13, fontWeight: "600", color: colors.textoSuave },
-  textoActivo: { color: "#FFFFFF" },
+  texto: { fontSize: 13, fontWeight: '600', color: colors.textoSuave },
+  textoActivo: { color: '#FFFFFF' },
 });

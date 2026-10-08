@@ -7,7 +7,6 @@ import {
   useMemo,
   useState,
 } from 'react';
-import { Alert } from 'react-native';
 
 const CLAVE_RESERVAS = '@reservas_ingles';
 
@@ -63,7 +62,7 @@ export function ReservaProvider({ children }) {
       setEliminando(false);
     }
   }, []);
-  
+
   // Carga inicial
   useEffect(() => {
     cargarReservas();
@@ -84,47 +83,15 @@ export function ReservaProvider({ children }) {
     guardarReservas();
   }, [reservas, cargando]);
 
-  const agregarReserva = useCallback((clase, horario) => {
-    const nuevaReserva = {
-      id: `${clase.id}-${horario}`,
-      titulo: clase.titulo,
-      nivel: clase.nivel,
-      profesor: clase.profesor.nombre,
-      precio: clase.precio,
-      horario,
-      creadoEn: new Date().toISOString(),
-    };
-
-    setReservas((reservasAnteriores) => {
-      const yaExiste = reservasAnteriores.some(
-        (reserva) => reserva.id === nuevaReserva.id,
-      );
-
-      if (yaExiste) {
-        return reservasAnteriores;
-      }
-
-      return [nuevaReserva, ...reservasAnteriores];
-    });
-  }, []);
-
   const valor = useMemo(
     () => ({
       reservas,
       cargando,
       cargarReservas,
-      agregarReserva,
       eliminando,
-      eliminarReserva
+      eliminarReserva,
     }),
-    [
-      reservas,
-      cargando,
-      cargarReservas,
-      agregarReserva,
-      eliminando,
-      eliminarReserva
-    ],
+    [reservas, cargando, cargarReservas, eliminando, eliminarReserva],
   );
 
   return (

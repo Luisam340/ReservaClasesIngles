@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
-import { Alert, StyleSheet, Text, View } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { colors, spacing, typography } from "../theme";
+import React, { useEffect, useState } from 'react';
+import { Alert, StyleSheet, Text, View } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { colors, spacing, typography } from '../theme';
 
 export default function LoginScreen() {
 	const [estudiante, setEstudiante] = useState(null);
@@ -9,10 +9,10 @@ export default function LoginScreen() {
 	useEffect(() => {
 		async function cargarEstudiante() {
 			try {
-				const guardado = await AsyncStorage.getItem("estudiante");
+				const guardado = await AsyncStorage.getItem('estudiante');
 				setEstudiante(guardado ? JSON.parse(guardado) : null);
 			} catch {
-				Alert.alert("Error", "No se pudieron cargar los datos guardados.");
+				Alert.alert('Error', 'No se pudieron cargar los datos guardados.');
 			}
 		}
 
@@ -29,7 +29,7 @@ export default function LoginScreen() {
 					<Text style={styles.dato}>Correo: {estudiante.correo}</Text>
 				</>
 			) : (
-				<Text style={styles.mensaje}>Todavía no hay un registro guardado.</Text>
+				<Text style={styles.mensaje}>No hay estudiantes registrados.</Text>
 			)}
 		</View>
 	);
@@ -38,7 +38,7 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
 	pantalla: {
 		flex: 1,
-		justifyContent: "center",
+		justifyContent: 'center',
 		padding: spacing.xl,
 		backgroundColor: colors.fondo,
 	},

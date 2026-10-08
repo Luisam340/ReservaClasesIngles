@@ -1,19 +1,19 @@
-import { useEffect, useState } from "react";
-import {View, Text, StyleSheet, ScrollView, Alert, Image, Pressable} from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import useResponsive from "../hooks/useResponsive";
-import { colors, spacing, radius, typography, sombra } from "../theme";
-import { formatearPrecio } from "../data/classes";
-import LabelLevel from "../components/LabelLevel";
+import { useEffect, useState } from 'react';
+import {View, Text, StyleSheet, ScrollView, Alert, Image, Pressable} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import useResponsive from '../hooks/useResponsive';
+import { colors, spacing, radius, typography, sombra } from '../theme';
+import { formatearPrecio } from '../data/classes';
+import LabelLevel from '../components/LabelLevel';
 
-const CLAVE_RESERVAS = "reservas";
+
+const CLAVE_RESERVAS = '@reservas_ingles';
 
 async function cargarReservas() {
   const guardadas = await AsyncStorage.getItem(CLAVE_RESERVAS);
-  if (!guardadas) return [];
-
+  if (!guardadas) return []
   const reservas = JSON.parse(guardadas);
   return Array.isArray(reservas) ? reservas : [];
 }
@@ -36,33 +36,33 @@ export default function DetalleClasesScreen({ route, navigation }) {
     }
 
     cargarCupos().catch(() => {
-      Alert.alert("Error", "No se pudieron cargar los cupos.");
+      Alert.alert('Error', 'No se pudieron cargar los cupos.');
     });
   }, [clase.cupos, clase.id]);
 
   async function reservar() {
     if (!horarioSeleccionado) {
-      Alert.alert("Elige un horario", "Selecciona un horario para continuar.");
+      Alert.alert('Elige un horario', 'Selecciona un horario para continuar.');
       return;
     }
 
     if (cupos < 1) {
-      Alert.alert("Sin cupos", "Esta clase ya no tiene cupos disponibles.");
+      Alert.alert('Sin cupos', 'Esta clase ya no tiene cupos disponibles.');
       return;
     }
 
     setGuardando(true);
     try {
-      const datosEstudiante = await AsyncStorage.getItem("estudiante");
+      const datosEstudiante = await AsyncStorage.getItem('estudiante');
       if (!datosEstudiante) {
         Alert.alert(
-          "Regístrate primero",
-          "Necesitas un perfil para guardar la reserva.",
+          'Regístrate primero',
+          'Necesitas un perfil para realizar una reserva.',
           [
-            { text: "Cancelar", style: "cancel" },
+            { text: 'Cancelar', style: 'cancel' },
             {
-              text: "Registrarme",
-              onPress: () => navigation.navigate("Registro"),
+              text: 'Registrarme',
+              onPress: () => navigation.navigate('Registro'),
             },
           ],
         );
@@ -79,7 +79,7 @@ export default function DetalleClasesScreen({ route, navigation }) {
       );
 
       if (horarioOcupado) {
-        Alert.alert("Horario ocupado", "Ya reservaste ese horario.");
+        Alert.alert('Horario ocupado', 'Ya tienes una clase reservada en ese horario.');
         return;
       }
 
@@ -88,12 +88,12 @@ export default function DetalleClasesScreen({ route, navigation }) {
       );
       if (reservasClase.length >= clase.cupos) {
         setCupos(0);
-        Alert.alert("Sin cupos", "Esta clase ya no tiene cupos disponibles.");
+        Alert.alert('Sin cupos', 'Esta clase ya no tiene cupos disponibles.');
         return;
       }
 
       const nuevaReserva = {
-        id: `${Date.now()}`, //
+        id: `${Date.now()}`,
         estudianteCorreo: correo,
         estudianteNombre: `${estudiante.nombre} ${estudiante.apellido}`,
         claseId: clase.id,
@@ -109,20 +109,20 @@ export default function DetalleClasesScreen({ route, navigation }) {
       );
       setCupos(Math.max(0, clase.cupos - reservasClase.length - 1));
       Alert.alert(
-        "Reserva guardada",
-        "La reserva quedó asociada a tu perfil.",
+        'Reserva guardada',
+        'La reserva quedó asociada a tu perfil.',
         [
           {
-            text: "Ver reservas",
+            text: 'Ver reservas',
             onPress: () =>
-              navigation.navigate("ClasesTabs", { screen: "Reservas" }),
+              navigation.navigate('ClasesTabs', { screen: 'Reservas' }),
           },
-          { text: "Seguir aquí", style: "cancel" },
+          { text: 'Seguir aquí', style: 'cancel' },
         ],
       );
     } catch (error) {
       const detalle = error instanceof Error ? error.message : String(error);
-      Alert.alert("Error", `No se pudo guardar la reserva. ${detalle}`);
+      Alert.alert('Error', `No se pudo guardar la reserva. ${detalle}`);
     } finally {
       setGuardando(false);
     }
@@ -137,7 +137,7 @@ export default function DetalleClasesScreen({ route, navigation }) {
       >
         <Image
           source={{ uri: clase.imagen }}
-          resizeMode="cover"
+          resizeMode='cover'
           style={[estilos.portada, { height: esTablet ? 300 : 220 }]}
         />
 
@@ -153,7 +153,7 @@ export default function DetalleClasesScreen({ route, navigation }) {
 
           <View style={estilos.datos}>
             <View style={estilos.dato}>
-              <Ionicons name="time-outline" size={20} color={colors.primario} />
+              <Ionicons name='time-outline' size={20} color={colors.primario} />
 
               <Text style={estilos.datoValor}>{clase.duracion} minutos</Text>
 
@@ -162,7 +162,7 @@ export default function DetalleClasesScreen({ route, navigation }) {
 
             <View style={estilos.dato}>
               <Ionicons
-                name="people-outline"
+                name='people-outline'
                 size={20}
                 color={colors.primario}
               />
@@ -176,7 +176,7 @@ export default function DetalleClasesScreen({ route, navigation }) {
           <View style={estilos.profesor}>
             <Image
               source={{ uri: clase.profesor.foto }}
-              resizeMode="cover"
+              resizeMode='cover'
               style={estilos.avatar}
             />
 
@@ -203,7 +203,7 @@ export default function DetalleClasesScreen({ route, navigation }) {
               return (
                 <Pressable
                   key={horario}
-                  accessibilityRole="button"
+                  accessibilityRole='button'
                   accessibilityState={{ selected: seleccionado }}
                   onPress={() => setHorarioSeleccionado(horario)}
                   style={[
@@ -252,7 +252,7 @@ export default function DetalleClasesScreen({ route, navigation }) {
           ]}
         >
           <Text style={estilos.textoBoton}>
-            {guardando ? "Guardando..." : "Reservar"}
+            {guardando ? 'Guardando...' : 'Reservar'}
           </Text>
         </Pressable>
       </View>
@@ -267,13 +267,13 @@ const estilos = StyleSheet.create({
   },
 
   portada: {
-    width: "100%",
+    width: '100%',
     backgroundColor: colors.primarioSuave,
   },
 
   titulo: {
     fontSize: 24,
-    fontWeight: "800",
+    fontWeight: '800',
     color: colors.texto,
     marginTop: spacing.sm,
     marginBottom: spacing.lg,
@@ -281,8 +281,8 @@ const estilos = StyleSheet.create({
   },
 
   datos: {
-    flexDirection: "row",
-    justifyContent: "space-around",
+    flexDirection: 'row',
+    justifyContent: 'space-around',
     backgroundColor: colors.superficie,
     borderRadius: radius.lg,
     paddingVertical: spacing.lg,
@@ -290,13 +290,13 @@ const estilos = StyleSheet.create({
   },
 
   dato: {
-    alignItems: "center",
+    alignItems: 'center',
     gap: 2,
   },
 
   datoValor: {
     fontSize: 16,
-    fontWeight: "800",
+    fontWeight: '800',
     color: colors.texto,
     marginHorizontal: 10,
   },
@@ -307,8 +307,8 @@ const estilos = StyleSheet.create({
   },
 
   profesor: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: spacing.md,
     backgroundColor: colors.superficie,
     borderRadius: radius.lg,
@@ -329,7 +329,7 @@ const estilos = StyleSheet.create({
 
   profesorNombre: {
     fontSize: 15,
-    fontWeight: "700",
+    fontWeight: '700',
     color: colors.texto,
   },
 
@@ -349,16 +349,16 @@ const estilos = StyleSheet.create({
   },
 
   horarios: {
-    flexDirection: "row",
-    flexWrap: "wrap",
+    flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: spacing.sm,
     marginTop: spacing.md,
     marginBottom: spacing.lg,
   },
 
   horario: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: spacing.sm,
     backgroundColor: colors.superficie,
     borderWidth: 1,
@@ -376,7 +376,7 @@ const estilos = StyleSheet.create({
 
   horarioTexto: {
     fontSize: 14,
-    fontWeight: "600",
+    fontWeight: '600',
     color: colors.texto,
   },
 
@@ -388,8 +388,8 @@ const estilos = StyleSheet.create({
     backgroundColor: colors.primario,
     paddingVertical: 12,
     width: 200,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     borderRadius: radius.md,
     marginVertical: 5,
   },
@@ -403,12 +403,12 @@ const estilos = StyleSheet.create({
   },
 
   barra: {
-    position: "absolute",
+    position: 'absolute',
     left: 0,
     right: 0,
     bottom: 0,
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: colors.superficie,
     borderTopWidth: 1,
     borderTopColor: colors.borde,
@@ -431,12 +431,12 @@ const estilos = StyleSheet.create({
   textoBoton: {
     color: colors.primarioSuave,
     fontSize: 16,
-    fontWeight: "600",
+    fontWeight: '600',
   },
 
   precio: {
     fontSize: 18,
-    fontWeight: "800",
+    fontWeight: '800',
     color: colors.primario,
     marginHorizontal: 10,
   },

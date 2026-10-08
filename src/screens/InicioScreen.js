@@ -1,18 +1,18 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo } from 'react';
 import {
   View,
   StyleSheet,
   TextInput,
   ScrollView,
   FlatList,
-} from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import NivelChip from "../components/NivelChip";
-import EstadoVacio from "../components/EstadoVacio";
-import Card from "../components/Card";
-import useResponsive from "../hooks/useResponsive";
-import { colors, radius, spacing } from "../theme";
-import { CLASES, NIVELES } from "../data/classes";
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import NivelChip from '../components/NivelChip';
+import EstadoVacio from '../components/EstadoVacio';
+import Card from '../components/Card';
+import useResponsive from '../hooks/useResponsive';
+import { colors, radius, spacing } from '../theme';
+import { CLASES, NIVELES } from '../data/classes';
 
 /*todos los screen necesitan la variable navigation, esto para cambiarse entre pantallas en cualquier momento
 se instala la librería en este orden:
@@ -23,15 +23,15 @@ se instala la librería en este orden:
 
 export default function InicioScreen({ navigation }) {
   const { columnas, paddingHorizontal } = useResponsive();
-  const [nivel, setNivel] = useState("Todos");
-  const [busqueda, setBusqueda] = useState("");
+  const [nivel, setNivel] = useState('Todos');
+  const [busqueda, setBusqueda] = useState('');
 
   const resultados = useMemo(() => {
     const textoBusqueda = busqueda.trim().toLocaleLowerCase();
     return CLASES.filter((clase) => {
-      const coincidenciaNivel = nivel === "Todos" || clase.nivel === nivel;
+      const coincidenciaNivel = nivel === 'Todos' || clase.nivel === nivel;
       const coincidenciaTexto =
-        textoBusqueda == "" ||
+        textoBusqueda == '' ||
         clase.titulo.toLocaleLowerCase().includes(textoBusqueda) ||
         clase.profesor.nombre.toLocaleLowerCase().includes(textoBusqueda);
       return coincidenciaNivel && coincidenciaTexto;
@@ -42,7 +42,7 @@ export default function InicioScreen({ navigation }) {
     <View style={[style.pantalla, { paddingTop: spacing.md }]}>
       {/*<Text>Aplicación para clase de Inglés</Text>*/}
       <View style={style.buscador}>
-        <Ionicons name="search" size={18} color={colors.textoSuave} />
+        <Ionicons name='search' size={18} color={colors.textoSuave} />
         <TextInput
           style={{ flex: 1 }}
           placeholder={nivel}
@@ -54,10 +54,10 @@ export default function InicioScreen({ navigation }) {
 
       {busqueda.length > 0 && (
         <Ionicons
-          name="close-circle"
+          name='close-circle'
           size={18}
           color={colors.textoSuave}
-          onPress={() => setBusqueda("")}
+          onPress={() => setBusqueda('')}
         />
       )}
       <ScrollView
@@ -81,7 +81,7 @@ export default function InicioScreen({ navigation }) {
           return (
             <Card
               clase={item}
-              onPress={() => navigation.navigate("DetalleClase", { clase: item })}
+              onPress={() => navigation.navigate('DetalleClase', { clase: item })}
               showVerticalScrollIndicator={false}
               contentContainerStyle={{
                 paddingHorizontal,
@@ -93,11 +93,11 @@ export default function InicioScreen({ navigation }) {
         numColumns={columnas}
         ListEmptyComponent={
           <EstadoVacio
-            icono="search-outline"
-            titulo="No encontramos resultados"
-            mensaje="La combinación de búsqueda no tiene resultados"
+            icono='search-outline'
+            titulo='No encontramos resultados'
+            mensaje='La combinación de búsqueda no tiene resultados'
             onAction={() => {
-              (setNivel("Todos"), setBusqueda(""));
+              (setNivel('Todos'), setBusqueda(''));
             }}
           />
         }
@@ -109,8 +109,8 @@ export default function InicioScreen({ navigation }) {
 const style = StyleSheet.create({
   pantalla: { flex: 1, backgroundColor: colors.fondo },
   buscador: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: spacing.sm,
     backgroundColor: colors.superficie,
     borderRadius: radius.md,

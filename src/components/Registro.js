@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   Alert,
   KeyboardAvoidingView,
@@ -9,19 +9,19 @@ import {
   Text,
   TextInput,
   View,
-} from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { colors, radius, sombra, spacing, typography } from "../theme";
+} from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { colors, radius, sombra, spacing, typography } from '../theme';
 
-const STORAGE_KEY = "estudiante";
+const STORAGE_KEY = 'estudiante';
 
 export default function Registro({ navigation }) {
   const [formulario, setFormulario] = useState({
-    nombre: "",
-    apellido: "",
-    correo: "",
-    contrasena: "",
-    confirmarContrasena: "",
+    nombre: '',
+    apellido: '',
+    correo: '',
+    contrasena: '',
+    confirmarContrasena: '',
   });
 
   function cambiarFormulario(campo, valor) {
@@ -33,33 +33,45 @@ export default function Registro({ navigation }) {
     const apellido = formulario.apellido.trim();
     const correo = formulario.correo.trim().toLowerCase();
 
-    if (!nombre || !apellido || !correo || !formulario.contrasena || !formulario.confirmarContrasena) {
-      Alert.alert("Campos incompletos", "Completa todos los campos.");
+    if (
+      !nombre ||
+      !apellido ||
+      !correo ||
+      !formulario.contrasena ||
+      !formulario.confirmarContrasena
+    ) {
+      Alert.alert('Campos incompletos', 'Completa todos los campos.', [
+        {
+          text: 'Ok',
+          style: 'destructive',
+        },
+      ]);
       return;
     }
 
     if (formulario.contrasena !== formulario.confirmarContrasena) {
-      Alert.alert("Revisa la contraseña", "Las contraseñas no coinciden.");
+      Alert.alert('Revisa la contraseña', 'Las contraseñas no coinciden.');
       return;
     }
 
     try {
+      const foto = `${Date.now()}-${Math.random()}`;
       await AsyncStorage.setItem(
         STORAGE_KEY,
-        JSON.stringify({ nombre, apellido, correo }),
+        JSON.stringify({ nombre, apellido, correo, foto }),
       );
-      Alert.alert("Registro guardado", "Tus datos quedaron guardados en este dispositivo.", [
-        { text: "Continuar", onPress: () => navigation.replace("Login") },
+      Alert.alert('Registro exitoso', 'Tu cuenta se creó correctamente.', [
+        { text: 'Continuar', onPress: () => navigation.replace('Login') },
       ]);
     } catch {
-      Alert.alert("Error", "No se pudieron guardar los datos.");
+      Alert.alert('Error', 'No se pudieron guardar los datos.');
     }
   }
 
   return (
     <KeyboardAvoidingView
       style={styles.pantalla}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <ScrollView
         contentContainerStyle={styles.contenido}
@@ -71,19 +83,19 @@ export default function Registro({ navigation }) {
             style={styles.input}
             placeholder="Nombre"
             value={formulario.nombre}
-            onChangeText={(valor) => cambiarFormulario("nombre", valor)}
+            onChangeText={(valor) => cambiarFormulario('nombre', valor)}
           />
           <TextInput
             style={styles.input}
             placeholder="Apellido"
             value={formulario.apellido}
-            onChangeText={(valor) => cambiarFormulario("apellido", valor)}
+            onChangeText={(valor) => cambiarFormulario('apellido', valor)}
           />
           <TextInput
             style={styles.input}
             placeholder="Correo electrónico"
             value={formulario.correo}
-            onChangeText={(valor) => cambiarFormulario("correo", valor)}
+            onChangeText={(valor) => cambiarFormulario('correo', valor)}
             keyboardType="email-address"
             autoCapitalize="none"
           />
@@ -91,7 +103,7 @@ export default function Registro({ navigation }) {
             style={styles.input}
             placeholder="Contraseña"
             value={formulario.contrasena}
-            onChangeText={(valor) => cambiarFormulario("contrasena", valor)}
+            onChangeText={(valor) => cambiarFormulario('contrasena', valor)}
             secureTextEntry
           />
           <TextInput
@@ -99,7 +111,7 @@ export default function Registro({ navigation }) {
             placeholder="Confirmar contraseña"
             value={formulario.confirmarContrasena}
             onChangeText={(valor) =>
-              cambiarFormulario("confirmarContrasena", valor)
+              cambiarFormulario('confirmarContrasena', valor)
             }
             secureTextEntry
           />
@@ -126,13 +138,13 @@ const styles = StyleSheet.create({
   },
   contenido: {
     flexGrow: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.xl,
   },
   formulario: {
-    width: "100%",
+    width: '100%',
     maxWidth: 460,
     padding: spacing.xl,
     backgroundColor: colors.superficie,
@@ -143,7 +155,7 @@ const styles = StyleSheet.create({
   },
   titulo: {
     ...typography.titulo,
-    textAlign: "center",
+    textAlign: 'center',
     marginBottom: spacing.lg,
   },
   input: {
@@ -156,10 +168,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
   },
   boton: {
-    alignItems: "center",
+    alignItems: 'center',
     backgroundColor: colors.exito,
     borderRadius: radius.md,
-    justifyContent: "center",
+    justifyContent: 'center',
     marginTop: spacing.sm,
     minHeight: 52,
   },
@@ -168,6 +180,6 @@ const styles = StyleSheet.create({
   },
   textoBoton: {
     color: colors.superficie,
-    fontWeight: "600",
+    fontWeight: '600',
   },
 });

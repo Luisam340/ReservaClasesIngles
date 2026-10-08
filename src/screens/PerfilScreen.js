@@ -1,13 +1,14 @@
-import React, { useCallback, useState } from "react";
-import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
-import { useFocusEffect, useNavigation } from "@react-navigation/native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { colors, spacing, typography } from "../theme";
+import React, { useCallback, useState } from 'react';
+import { Alert, Pressable, StyleSheet, Text, View, Image } from 'react-native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { colors, spacing, typography } from '../theme';
 
 export default function PerfilScreen() {
   const navigation = useNavigation();
   const [estudiante, setEstudiante] = useState(null);
   const [cargando, setCargando] = useState(true);
+  const [fotoPerfil, setFotoPerfil] = useState(null);
 
   useFocusEffect(
     useCallback(() => {
@@ -16,10 +17,15 @@ export default function PerfilScreen() {
       async function cargar() {
         setCargando(true);
         try {
-          const guardado = await AsyncStorage.getItem("estudiante");
+          const guardado = await AsyncStorage.getItem('estudiante');
           if (activa) setEstudiante(guardado ? JSON.parse(guardado) : null);
+          const semilla = `${Date.now()}-${Math.random()}`;
+
+          setFotoPerfil(
+            `https://api.dicebear.com/10.x/avataaars/png?seed=${encodeURIComponent(semilla)}`,
+          );
         } catch {
-          if (activa) Alert.alert("Error", "No se pudo cargar el perfil.");
+          if (activa) Alert.alert('Error', 'No se pudo cargar el perfil.');
         } finally {
           if (activa) setCargando(false);
         }
@@ -38,12 +44,15 @@ export default function PerfilScreen() {
         <Text style={styles.detalle}>Cargando perfil...</Text>
       ) : estudiante ? (
         <>
+          {fotoPerfil && (
+            <Image source={{ uri: fotoPerfil }} style={styles.avatar} />
+          )}
           <Text style={styles.titulo}>Perfil del estudiante</Text>
           <Text style={styles.detalle}>Nombre: {estudiante.nombre}</Text>
           <Text style={styles.detalle}>Apellido: {estudiante.apellido}</Text>
           <Text style={styles.detalle}>Correo: {estudiante.correo}</Text>
           <Pressable
-            onPress={() => navigation.navigate("Reservas")}
+            onPress={() => navigation.navigate('Reservas')}
             style={({ pressed }) => [
               styles.boton,
               styles.botonInicio,
@@ -59,7 +68,7 @@ export default function PerfilScreen() {
         <>
           <Text style={styles.titulo}>Bienvenido</Text>
           <Pressable
-            onPress={() => navigation.navigate("Login")}
+            onPress={() => navigation.navigate('Login')}
             style={({ pressed }) => [
               styles.boton,
               styles.botonInicio,
@@ -71,7 +80,7 @@ export default function PerfilScreen() {
             </Text>
           </Pressable>
           <Pressable
-            onPress={() => navigation.navigate("Registro")}
+            onPress={() => navigation.navigate('Registro')}
             style={({ pressed }) => [
               styles.boton,
               styles.botonRegistro,
@@ -91,8 +100,8 @@ export default function PerfilScreen() {
 const styles = StyleSheet.create({
   pantalla: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     padding: spacing.xl,
     backgroundColor: colors.fondo,
   },
@@ -111,14 +120,14 @@ const styles = StyleSheet.create({
   },
   textoBoton: {
     fontSize: 16,
-    fontWeight: "600",
+    fontWeight: '600',
   },
   boton: {
     paddingVertical: 12,
     width: 200,
-    justifyContent: "center",
-    alignItems: "center",
-    alignSelf: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
+    alignSelf: 'center',
     borderRadius: 25,
     marginVertical: 5,
   },
@@ -136,5 +145,11 @@ const styles = StyleSheet.create({
   },
   textoRegistro: {
     color: colors.superficie,
+  },
+  avatar: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: colors.borde,
   },
 });
